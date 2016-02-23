@@ -1,4 +1,7 @@
-# Copyright 2014 Google Inc. All rights reserved.
+#!/bin/bash
+#
+# Copyright 2008, Google Inc.
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,51 +29,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Ignore other VCSs.
-.svn/
+# Executes the samples and tests for the Google Test Framework.
 
-# Ignore common compiled artifacts.
-*~
-*.o
-lib*.a
-/breakpad.pc
-/breakpad-client.pc
-/src/client/linux/linux_client_unittest_shlib
-/src/client/linux/linux_dumper_unittest_helper
-/src/processor/microdump_stackwalk
-/src/processor/minidump_dump
-/src/processor/minidump_stackwalk
-/src/tools/linux/core2md/core2md
-/src/tools/linux/dump_syms/dump_syms
-/src/tools/linux/md2core/minidump-2-core
-/src/tools/linux/symupload/minidump_upload
-/src/tools/linux/symupload/sym_upload
+# Help the dynamic linker find the path to the libraries.
+export DYLD_FRAMEWORK_PATH=$BUILT_PRODUCTS_DIR
+export DYLD_LIBRARY_PATH=$BUILT_PRODUCTS_DIR
 
-# Ignore autotools generated artifacts.
-.deps
-.dirstamp
-autom4te.cache/
-/config.cache
-config.h
-/config.log
-/config.status
-/Makefile
-stamp-h1
+# Create some executables.
+test_executables=$@
 
-# Ignore GYP generated Visual Studio artifacts.
-*.filters
-*.sdf
-*.sln
-*.suo
-*.vcproj
-*.vcxproj
+# Now execute each one in turn keeping track of how many succeeded and failed.
+succeeded=0
+failed=0
+failed_list=()
+for test in ${test_executables[*]}; do
+  "$test"
+  result=$?
+  if [ $result -eq 0 ]; then
+    succeeded=$(( $succeeded + 1 ))
+  else
+    failed=$(( failed + 1 ))
+    failed_list="$failed_list $test"
+  fi
+done
 
-# Ignore compiled Python files.
-*.pyc
-
-# Ignore directories gclient syncs.
-src/testing
-#src/third_party/glog
-#src/third_party/lss
-#src/third_party/protobuf
-src/tools/gyp
+# Report the successes and failures to the console.
+echo "Tests complete with $succeeded successes and $failed failures."
+if [ $failed -ne 0 ]; then
+  echo "The following tests failed:"
+  echo $failed_list
+fi
+exit $failed

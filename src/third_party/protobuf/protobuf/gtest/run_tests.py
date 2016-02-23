@@ -1,4 +1,6 @@
-# Copyright 2014 Google Inc. All rights reserved.
+#!/usr/bin/env python
+#
+# Copyright 2008, Google Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,51 +28,33 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Ignore other VCSs.
-.svn/
+"""Runs the specified tests for Google Test.
 
-# Ignore common compiled artifacts.
-*~
-*.o
-lib*.a
-/breakpad.pc
-/breakpad-client.pc
-/src/client/linux/linux_client_unittest_shlib
-/src/client/linux/linux_dumper_unittest_helper
-/src/processor/microdump_stackwalk
-/src/processor/minidump_dump
-/src/processor/minidump_stackwalk
-/src/tools/linux/core2md/core2md
-/src/tools/linux/dump_syms/dump_syms
-/src/tools/linux/md2core/minidump-2-core
-/src/tools/linux/symupload/minidump_upload
-/src/tools/linux/symupload/sym_upload
+This script requires Python 2.3 or higher.  To learn the usage, run it
+with -h.
+"""
 
-# Ignore autotools generated artifacts.
-.deps
-.dirstamp
-autom4te.cache/
-/config.cache
-config.h
-/config.log
-/config.status
-/Makefile
-stamp-h1
+import os
+import sys
 
-# Ignore GYP generated Visual Studio artifacts.
-*.filters
-*.sdf
-*.sln
-*.suo
-*.vcproj
-*.vcxproj
+SCRIPT_DIR = os.path.dirname(__file__) or '.'
 
-# Ignore compiled Python files.
-*.pyc
+sys.path.append(os.path.join(SCRIPT_DIR, 'test'))
+import run_tests_util
 
-# Ignore directories gclient syncs.
-src/testing
-#src/third_party/glog
-#src/third_party/lss
-#src/third_party/protobuf
-src/tools/gyp
+
+def _Main():
+  """Runs all tests for Google Test."""
+
+  options, args = run_tests_util.ParseArgs('gtest')
+  test_runner = run_tests_util.TestRunner(script_dir=SCRIPT_DIR)
+  tests = test_runner.GetTestsToRun(args,
+                                    options.configurations,
+                                    options.built_configurations)
+  if not tests:
+    sys.exit(1)  # Incorrect parameters given, abort execution.
+
+  sys.exit(test_runner.RunTests(tests[0], tests[1]))
+
+if __name__ == '__main__':
+  _Main()
