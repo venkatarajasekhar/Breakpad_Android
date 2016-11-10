@@ -52,7 +52,7 @@ typedef struct user_fxsr_struct user_fpxregs_struct;
 #endif  // __cplusplus
 #endif  // __i386__
 
-#ifdef __aarch64__
+/*#ifdef __aarch64__
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
@@ -70,6 +70,6 @@ struct user_fpsimd_struct {
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
-#endif  // __aarch64__
+#endif  // __aarch64__*/
 
 #endif  // GOOGLE_BREAKPAD_COMMON_ANDROID_INCLUDE_SYS_USER_H
